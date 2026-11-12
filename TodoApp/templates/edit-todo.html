@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}Edit Todo — TodoApp{% endblock %}
+
+{% block content %}
+<div class="main-container">
+  <div class="page-header">
+    <div>
+      <h1>Edit Todo</h1>
+      <p>Update the details of your task.</p>
+    </div>
+    <a href="/" class="btn btn-outline-secondary">&larr; Back to Home</a>
+  </div>
+
+  <div class="form-card">
+    <div class="card">
+      <div class="card-header">Edit Task</div>
+      <div style="padding:1.75rem;">
+        <form action="/todos/edit-todo/{{ todo.id }}" method="post" class="js-loading-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+
+          <div class="mb-3">
+            <label class="form-label" for="title">Title <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="title" name="title"
+                   class="form-control"
+                   value="{{ todo.title }}"
+                   minlength="3" maxlength="100" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="description">Description <span style="color:var(--danger)">*</span></label>
+            <textarea id="description" name="description"
+                      class="form-control" rows="3"
+                      minlength="3" maxlength="300" required>{{ todo.description }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="priority">Priority</label>
+            <select id="priority" name="priority" class="form-control priority-select">
+              {% for p in [1,2,3,4,5] %}
+                <option value="{{ p }}" {% if todo.priority == p %}selected{% endif %}>
+                  {{ p }} — {% if p==1 %}Very Low{% elif p==2 %}Low{% elif p==3 %}Medium{% elif p==4 %}High{% else %}Critical{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox"
+                     id="complete" name="complete" value="true"
+                     {% if todo.complete %}checked{% endif %}>
+              <label class="form-check-label" for="complete">Mark as completed</label>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:.75rem;">
+            <button type="submit" class="btn btn-primary btn-lg flex-fill" data-loading-text="Saving...">Save Changes</button>
+            <a href="/" class="btn btn-outline-secondary btn-lg">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

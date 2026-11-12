@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block title %}Profile — TodoApp{% endblock %}
+
+{% block content %}
+<div class="main-container">
+  <div class="page-header">
+    <div>
+      <h1>My Profile</h1>
+      <p>Manage your account details and password.</p>
+    </div>
+    <a href="/" class="btn btn-outline-secondary">&larr; Back to Home</a>
+  </div>
+
+  <div class="form-card">
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-header">Account Information</div>
+      <div style="padding:1.5rem;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:.6rem 0;font-weight:600;color:var(--text-muted);font-size:.85rem;width:140px;">Name</td>
+            <td style="padding:.6rem 0;">{{ user.first_name }} {{ user.last_name }}</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:.6rem 0;font-weight:600;color:var(--text-muted);font-size:.85rem;">Email</td>
+            <td style="padding:.6rem 0;">{{ user.email }}</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:.6rem 0;font-weight:600;color:var(--text-muted);font-size:.85rem;">Role</td>
+            <td style="padding:.6rem 0;">
+              <span class="status-badge status-open">{{ user.role | title }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:.6rem 0;font-weight:600;color:var(--text-muted);font-size:.85rem;">Account Status</td>
+            <td style="padding:.6rem 0;">
+              {% if user.is_active %}
+                <span class="status-badge status-done">Active</span>
+              {% else %}
+                <span class="status-badge" style="background:#fee2e2;color:#991b1b;">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Change Password</div>
+      <div style="padding:1.75rem;">
+        <form action="/auth/change-password" method="post" class="js-loading-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+          <div class="mb-3">
+            <label class="form-label" for="current_password">Current Password</label>
+            <input type="password" id="current_password" name="current_password"
+                   class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="new_password">New Password</label>
+            <input type="password" id="new_password" name="new_password"
+                   class="form-control" placeholder="Min 6 characters"
+                   minlength="6" maxlength="72" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="confirm_new_password">Confirm New Password</label>
+            <input type="password" id="confirm_new_password" name="confirm_new_password"
+                   class="form-control" placeholder="Repeat new password"
+                   minlength="6" maxlength="72" required>
+          </div>
+          <button type="submit" class="btn btn-primary" data-loading-text="Updating...">Update Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

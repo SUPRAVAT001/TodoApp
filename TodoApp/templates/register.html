@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — TodoApp</title>
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <div class="brand">
+      <h2>TodoApp</h2>
+      <p>Create your free account</p>
+    </div>
+
+    {% if msg %}
+      <div class="alert alert-{{ msg_type | default('danger') }}" role="alert">{{ msg }}</div>
+    {% endif %}
+    <div class="alert alert-danger" id="registerClientError" role="alert" style="display:none;"></div>
+
+    <form action="/auth/register" method="post" id="registerForm" class="js-loading-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+      <div class="form-row mb-3">
+        <div class="col">
+          <label class="form-label" for="first_name">First Name</label>
+          <input type="text" id="first_name" name="first_name"
+                 class="form-control" placeholder="Alice"
+                 value="{{ form_data.first_name if form_data else '' }}" required>
+        </div>
+        <div class="col">
+          <label class="form-label" for="last_name">Last Name</label>
+          <input type="text" id="last_name" name="last_name"
+                 class="form-control" placeholder="Smith"
+                 value="{{ form_data.last_name if form_data else '' }}" required>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="email">Email address</label>
+        <input type="email" id="email" name="email"
+               class="form-control" placeholder="you@example.com"
+               value="{{ form_data.email if form_data else '' }}"
+               autocomplete="email" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" name="password"
+               class="form-control" placeholder="Min 6 characters"
+               autocomplete="new-password" required minlength="6" maxlength="72">
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password"
+               class="form-control" placeholder="Repeat your password"
+               autocomplete="new-password" required minlength="6" maxlength="72">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" data-loading-text="Creating account...">Create Account</button>
+    </form>
+
+    <div class="auth-divider">or</div>
+
+    <div style="text-align:center;font-size:.9rem;color:var(--text-muted);">
+      Already have an account?
+      <a href="/auth/login" style="font-weight:600;">Sign in &rarr;</a>
+    </div>
+
+  </div>
+</div>
+<script src="/static/js/jquery-slim.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/todos.js"></script>
+</body>
+</html>

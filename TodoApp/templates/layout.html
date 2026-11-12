@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Todo App{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg>
+      TodoApp
+    </a>
+
+    <button class="navbar-toggler" type="button"
+            data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        {% if user %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.url.path == '/' %}active{% endif %}" href="/">
+              Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if '/todos/add' in request.url.path %}active{% endif %}" href="/todos/add-todo">
+              Add Todo
+            </a>
+          </li>
+          {% if user.role == 'admin' %}
+            <li class="nav-item">
+              <a class="nav-link {% if '/admin' in request.url.path %}active{% endif %}" href="/admin/">
+                Admin
+              </a>
+            </li>
+          {% endif %}
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav ml-auto">
+        {% if user %}
+          <li class="nav-item">
+            <a class="nav-link {% if '/auth/profile' in request.url.path %}active{% endif %}" href="/auth/profile">
+              Profile ({{ user.first_name }})
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/logout">
+              Logout
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link {% if '/auth/login' in request.url.path %}active{% endif %}" href="/auth/login">
+              Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if '/auth/register' in request.url.path %}active{% endif %}" href="/auth/register">
+              Register
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div style="max-width:900px;margin:1rem auto;padding:0 1rem;">
+  {% if msg %}
+    <div class="alert alert-{{ msg_type | default('info') }}" role="alert" data-auto-dismiss>
+      {% if msg_type == 'success' %}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      {% elif msg_type == 'danger' %}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z"/>
+        </svg>
+      {% endif %}
+      <span>{{ msg }}</span>
+    </div>
+  {% endif %}
+</div>
+
+{% block content %}{% endblock %}
+
+<script src="/static/js/jquery-slim.js"></script>
+<script src="/static/js/popper.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/todos.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

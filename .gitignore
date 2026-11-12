@@ -1,0 +1,27 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Virtual environments
+venv/
+.venv/
+.venv-1/
+fastapienv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Test databases
+*.db
+*.sqlite
+*.sqlite3
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
