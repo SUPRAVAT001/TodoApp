@@ -1,11 +1,12 @@
 """FastAPI TodoApp entrypoint, middleware, home route, and router wiring."""
 
+import os
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
-from .config import COOKIE_SECURE, STATIC_DIR
+from .config import COOKIE_SECURE, ENVIRONMENT, STATIC_DIR
 from .database import get_db
 from .models import Todos
 from .routers import admin, auth, todos, users
@@ -17,7 +18,17 @@ from .security import (
     templates,
 )
 
-app = FastAPI(title="TodoApp", version="1.0.0")
+docs_enabled: bool = (ENVIRONMENT != "production") or (
+    os.getenv("ENABLE_API_DOCS", "false").lower() in ("true", "1", "yes")
+)
+
+app = FastAPI(
+    title="TodoApp",
+    version="1.0.0",
+    docs_url="/docs" if docs_enabled else None,
+    redoc_url="/redoc" if docs_enabled else None,
+    openapi_url="/openapi.json" if docs_enabled else None,
+)
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 

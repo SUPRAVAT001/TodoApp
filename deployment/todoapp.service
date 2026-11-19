@@ -1,0 +1,42 @@
+# ==============================================================================
+# Hardened Systemd Service Unit: todoapp.service
+# Application: TodoApp FastAPI Production Service
+# Target Architecture: Oracle Linux 9.8 (x86_64)
+# ==============================================================================
+
+[Unit]
+Description=TodoApp FastAPI Production Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=todoapp
+Group=todoapp
+WorkingDirectory=/home/todoapp/apps/todoapp/app
+
+Environment=PYTHONUNBUFFERED=1
+Environment=ENVIRONMENT=production
+
+ExecStart=/home/todoapp/apps/todoapp/.venv/bin/uvicorn TodoApp.main:app --host 127.0.0.1 --port 8000 --workers 1
+
+Restart=on-failure
+RestartSec=5
+
+# Security Sandboxing & Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+# Memory Guardrails (Target Host: 1.0 GB RAM)
+MemoryHigh=128M
+MemoryMax=192M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,52 @@
+# ==============================================================================
+# Production Caddyfile: todo.veyrion.in
+# Target Server: Oracle Cloud Infrastructure (80.225.229.214)
+# Reverse Proxy: Uvicorn ASGI Server (127.0.0.1:8000)
+# ==============================================================================
+
+# Canonical Application Host
+todo.veyrion.in {
+    encode zstd gzip
+
+    # Defensive Security Headers
+    header {
+        Strict-Transport-Security "max-age=86400"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self';"
+        -Server
+    }
+
+    # Reverse Proxy to Uvicorn ASGI Server
+    reverse_proxy 127.0.0.1:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+
+        # Strip upstream server header from response
+        header_down -Server
+    }
+
+    # Structured JSON Access Logging
+    log {
+        output file /var/log/caddy/todo.veyrion.in.access.log {
+            roll_size 20mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+    }
+}
+
+# Legacy Subdomain Migration Redirect (Preserves Existing Demo Bookmarks)
+80-225-229-214.sslip.io {
+    redir https://todo.veyrion.in{uri} permanent
+}
+
+# Plaintext HTTP Catch-All — Redirects Any Insecure HTTP Traffic to HTTPS
+:80 {
+    redir https://todo.veyrion.in{uri} permanent
+}

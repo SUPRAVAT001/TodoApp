@@ -13,6 +13,11 @@ from sqlalchemy.orm import Session
 from ..config import ACCESS_TOKEN_EXPIRE_MINUTES, COOKIE_SECURE
 from ..database import get_db
 from ..models import Users
+from ..rate_limiter import (
+    check_rate_limit,
+    get_login_rate_limit,
+    get_register_rate_limit,
+)
 from ..schemas import CreateUserRequest, Token, UserResponse
 from ..security import (
     ACCESS_COOKIE_NAME,
@@ -174,8 +179,8 @@ async def login_post(
     csrf_token: Optional[str] = Form(default=None),
     db: Session = Depends(get_db),
 ):
-    if request.cookies.get(CSRF_COOKIE_NAME):
-        verify_csrf_protection(request, csrf_token)
+    check_rate_limit(request, action="login", max_requests=get_login_rate_limit())
+    verify_csrf_protection(request, csrf_token)
 
     user = authenticate_user(username, password, db)
     if not user:
@@ -253,8 +258,8 @@ async def register_post(
     csrf_token: Optional[str] = Form(default=None),
     db: Session = Depends(get_db),
 ):
-    if request.cookies.get(CSRF_COOKIE_NAME):
-        verify_csrf_protection(request, csrf_token)
+    check_rate_limit(request, action="register", max_requests=get_register_rate_limit())
+    verify_csrf_protection(request, csrf_token)
 
     clean_email = email.strip().lower()
     clean_first = first_name.strip()
@@ -421,9 +426,11 @@ async def change_password(
     response_model=UserResponse,
 )
 async def create_user(
+    request: Request,
     create_user_request: CreateUserRequest,
     db: Session = Depends(get_db),
 ):
+    check_rate_limit(request, action="register", max_requests=get_register_rate_limit())
     clean_email = create_user_request.email.strip().lower()
     if "@" not in clean_email or "." not in clean_email.split("@")[-1]:
         raise HTTPException(
@@ -476,9 +483,11 @@ async def create_user(
     status_code=status.HTTP_200_OK,
 )
 async def login_for_access_token(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    check_rate_limit(request, action="login", max_requests=get_login_rate_limit())
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
